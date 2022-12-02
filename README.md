@@ -26,7 +26,7 @@ The generation of documents is being processed before the run, so it will not ov
 | `--indices` | Number of indices to write to |
 | `--documents` | Number of template documents that hold the same mapping |
 | `--client_conn` | Number of threads that send bulks to ES |
-| `--seconds` | How long should the test run. Note: it might take a bit longer, as sending of all bulks whose creation has been initiated is allowed |
+| `--duration` | How long should the test run. Note: it might take a bit longer, as sending of all bulks whose creation has been initiated is allowed |
 
 
 ### Optional Parameters
