@@ -18,7 +18,7 @@ host=https://10.10.33.101:9200
 username=elastic
 password=Passw0Rd!
 
-python3 es-perf-test.py --es_ip $host \
+python3 os-perf-test.py --es_ip $host \
         --indices $indices --documents $documents \
         --client_conn $clients --duration $seconds \
         --number-of-shards $shards \
