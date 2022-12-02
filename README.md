@@ -22,7 +22,7 @@ The generation of documents is being processed before the run, so it will not ov
 ### Mandatory Parameters
 | Parameter | Description |
 | --- | --- |
-| `--es_ip` | Address of the Opensearch cluster (no protocol and port). You can supply mutiple clusters here, but only **one** node in each cluster (preferably the client node) |
+| `--os_ip` | Address of the Opensearch cluster (no protocol and port). You can supply mutiple clusters here, but only **one** node in each cluster (preferably the client node) |
 | `--indices` | Number of indices to write to |
 | `--documents` | Number of template documents that hold the same mapping |
 | `--client_conn` | Number of threads that send bulks to ES |
@@ -80,11 +80,11 @@ python os-perf-test.py  --es_ip http://10.10.33.100:9200 http://10.10.33.101:920
 
 > Edit Dockerfile 
 ```bash
- docker build -t rkazak1/es-stress-test:v1 .
+ docker build -t rkazak1/os-stress-test:v1 .
 ```
 > The content output is in the log.txt file
 ```bash
- docker run -d rkazak1/es-stress-test:v1 > log.txt
+ docker run -d rkazak1/os-stress-test:v1 > log.txt
 ```
 ### Contribution
 You are more then welcome!
