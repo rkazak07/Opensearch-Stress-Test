@@ -1,13 +1,13 @@
-# Elasticsearch Stress Test
+# Opensearch Stress Test
 
 ### Overview
-This script generates a bunch of documents, and indexes as much as it can to Elasticsearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. Also this project supports working elasticsearch up to version 7.17.
+This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. Also this project supports working Opensearch up to version 7.17.
 
 ### How to use
 * Download this project
 * Change script
 * Make sure you have Python 3.6+
-* pip install elasticsearch7  
+* pip install Opensearch 
 
 
 ### How does it work
@@ -22,7 +22,7 @@ The generation of documents is being processed before the run, so it will not ov
 ### Mandatory Parameters
 | Parameter | Description |
 | --- | --- |
-| `--es_ip` | Address of the Elasticsearch cluster (no protocol and port). You can supply mutiple clusters here, but only **one** node in each cluster (preferably the client node) |
+| `--es_ip` | Address of the Opensearch cluster (no protocol and port). You can supply mutiple clusters here, but only **one** node in each cluster (preferably the client node) |
 | `--indices` | Number of indices to write to |
 | `--documents` | Number of template documents that hold the same mapping |
 | `--client_conn` | Number of threads that send bulks to ES |
@@ -41,37 +41,39 @@ The generation of documents is being processed before the run, so it will not ov
 | `--stats-frequency` | How frequent to show the statistics |30|
 | `--not-green` | Script doesn't wait for the cluster to be green |False|
 | `--no-verify` | No verify SSL certificates|False|
+|`--http_compress` | enables gzip compression for request bodies|False|
+|`--ssl_show_warn` | show ssl warnings|False|
 | `--ca-file` | Path to Certificate file ||
-| `--user` | HTTP authentication Username ||
-| `--pass` | HTTP authentication Password ||
+| `--user` | basic authentication Username ||
+| `--pass` | basic authentication Password ||
 
 
 
 
 ### Examples
-> Run the test for 2 Elasticsearch clusters, with 4 indices on each, 5 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 5 client connections
+> Run the test for 2 Opensearch clusters, with 4 indices on each, 5 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 5 client connections
 ```bash
-python es-perf-test.py  --es_ip http://10.10.33.100:9200 http://10.10.33.101:9200 --indices 4 --documents 5 --seconds 120 --not-green --client_conn 5
+python os-perf-test.py  --es_ip http://10.10.33.100:9200 http://10.10.33.101:9200 --indices 4 --documents 5 --seconds 120 --not-green --client_conn 5
 ```
 
-> Run the test on ES cluster 10.10.33.100, with 10 indices, 10 random documents with up to 10 fields in each, the size of each field on each document can be up to 50 chars, each index will have 1 shard and no replicas, the test will run from 1 client (thread) for 300 seconds, will print statistics every 15 seconds, will index in bulks of 5000 documents  will leave everything in Elasticsearch after the test and contains 10 client connections
+> Run the test on ES cluster 10.10.33.100, with 10 indices, 10 random documents with up to 10 fields in each, the size of each field on each document can be up to 50 chars, each index will have 1 shard and no replicas, the test will run from 1 client (thread) for 300 seconds, will print statistics every 15 seconds, will index in bulks of 5000 documents  will leave everything in Opensearch after the test and contains 10 client connections
 ```bash
- python es-perf-test.py --es_ip http://10.10.33.100 --indices 10 --documents 10 --client_conn 10 --seconds 300 --number-of-shards 1 --number-of-replicas 0 --bulk-size 5000 --max-fields-per-document 10 --max-size-per-field 50 --no-cleanup --stats-frequency 15
+ python os-perf-test.py --es_ip http://10.10.33.100 --indices 10 --documents 10 --client_conn 10 --seconds 300 --number-of-shards 1 --number-of-replicas 0 --bulk-size 5000 --max-fields-per-document 10 --max-size-per-field 50 --no-cleanup --stats-frequency 15
 ```
 
 > Run the test with SSL
 ```bash
- python es-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --seconds 120 --ca-file /path/ca.pem
+ python os-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --seconds 120 --ca-file /path/ca.pem
 ```
 
 > Run the test with SSL without verify the certificate
 ```bash
- python es-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --seconds 120 --no-verify
+ python os-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --seconds 120 --no-verify
 ```
 
 > Run the test with HTTP Authentification
 ```bash
- python es-perf-test.py --es_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user elastic --pass changeme
+ python os-perf-test.py --es_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user elastic --pass changeme
 ```
 
 ### Docker Installation
