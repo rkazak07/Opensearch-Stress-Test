@@ -1,7 +1,7 @@
 # Opensearch Stress Test
 
 ### Overview
-This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. Also this project supports working Opensearch up to version 2.4.0.
+This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. Also this project supports working Opensearch up to version 2.2.0.
 
 ### How to use
 * Download this project
