@@ -2,6 +2,7 @@
 
 ### Overview
 This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. 
+
 Note: This application is developed in opensearch version 1.3.6
 
 ### How to use
