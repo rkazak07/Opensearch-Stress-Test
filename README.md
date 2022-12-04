@@ -1,13 +1,14 @@
 # Opensearch Stress Test
 
 ### Overview
-This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. Also this project supports working Opensearch up to version 2.2.0.
+This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. 
+This application is developed in opensearch version 1.3.6
 
 ### How to use
 * Download this project
 * Change script
 * Make sure you have Python 3.6+
-* pip install Opensearch 
+* pip install opensearch-py (Tested in 1.1.0 and 2.0.1)
 
 
 ### How does it work
@@ -51,9 +52,9 @@ The generation of documents is being processed before the run, so it will not ov
 
 
 ### Examples
-> Run the test for 2 Opensearch clusters, with 4 indices on each, 5 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 5 client connections
+> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 2 client connections
 ```bash
-python os-perf-test.py  --es_ip http://10.10.33.100:9200 http://10.10.33.101:9200 --indices 4 --documents 5 --seconds 120 --not-green --client_conn 5
+python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk-size 500 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 ```
 
 > Run the test with SSL
@@ -70,6 +71,35 @@ python os-perf-test.py  --es_ip http://10.10.33.100:9200 http://10.10.33.101:920
 ```bash
  python os-perf-test.py --es_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user admin --pass admin
 ```
+
+### EXAMPLE OUTPUT
+```
+python3 os-perf-test.py --os_ip https://10.10.33.102:30650 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk-size 500 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
+
+Starting initialization of https://10.10.33.102:30650
+Done!
+Creating indices..
+Generating documents and workers..
+Done!
+Starting the test. Will print stats every 30 seconds.
+The test would run for 60 seconds, but it might take a bit more because we are waiting for current bulk operation to complete.
+
+Elapsed time: 31 seconds
+Successful bulks: 52 (26000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 770.9049263000488 MB which is 24.87 MB/s
+
+
+Test is done! Final results:
+Elapsed time: 60 seconds
+Successful bulks: 111 (55500 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 1647.783311843872 MB which is 27.46 MB/s
+
+Cleaning up created indices..
+Done!
+```
+
 
 ### Docker Installation
 
