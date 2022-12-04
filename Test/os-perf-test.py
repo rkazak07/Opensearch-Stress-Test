@@ -1,8 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin python3
 
 #
-# Stress test tool for elasticsearch
+# Stress test tool for Opensearch
 # 
+# Created and Generated Ramazan KAZAK
+#  https://devsecopsteam.com
 
 import signal
 import sys
@@ -18,7 +20,7 @@ import threading
 import string
 from random import randint, choice
 
-# To get the time
+# To get the time and sleep parameters
 import time
 from time import sleep
 # For misc
@@ -28,15 +30,13 @@ import sys
 import json
 
 
-# Try and import elasticsearch
+# Try and import opensearch
 try:
-    import ssl
-    from elasticsearch7 import Elasticsearch
-
+    from opensearchpy import OpenSearch
 
 except:
-    print("Could not import elasticsearch..")
-    print("Try: pip install elasticsearch7")
+    print("Could not import opensearch..")
+    print("Try: pip install opensearch-py")
     sys.exit(1)
 
 
@@ -47,13 +47,12 @@ urllib3.disable_warnings()
 parser = argparse.ArgumentParser()
 
 # Adds all params
-parser.add_argument("--es_ip", nargs='+', help="The address of your cluster (no protocol or port)", required=True)
+parser.add_argument("--os_ip", nargs='+', help="The address of your cluster (no protocol or port)", required=True)
 parser.add_argument("--indices", type=int, help="The number of indices to write to for each ip", required=True)
 parser.add_argument("--documents", type=int, help="The number different documents to write for each ip", required=True)
 parser.add_argument("--client_conn", type=int, help="The number of clients to write from for each ip", required=True)
-parser.add_argument("--seconds", type=int, help="The number of seconds to run for each ip", required=True)
-parser.add_argument("--number-of-shards", type=int, default=3, help="Number of shards per index (default 3)")
-parser.add_argument("--number-of-replicas", type=int, default=1, help="Number of replicas per index (default 1)")
+parser.add_argument("--duration", type=int, help="The number of seconds to run for each ip", required=True)
+parser.add_argument("--shards", type=int, default=3, help="Number of shards per index (default 3)")
 parser.add_argument("--bulk-size", type=int, default=1000, help="Number of document per request (default 1000)")
 parser.add_argument("--max-fields-per-document", type=int, default=100,
                     help="Max number of fields in each document (default 100)")
@@ -66,9 +65,12 @@ parser.set_defaults(green=True)
 
 parser.add_argument("--ca-file", dest="cafile", default="", help="Path to your certificate file")
 parser.add_argument("--no-verify", default=False, dest="no_verify", action="store_true", help="Do not verify certificate")
+parser.add_argument("--ssl_show_warn", default=False, dest="ssl_show_warn", action="store_true", help="show ssl warnings")
+parser.add_argument("--http_compress", default=False, dest="http_compress", action="store_true", help="enables gzip compression for request bodies")
+parser.add_argument("--ssl_assert_hostname", default=False, dest="ssl_assert_hostname", action="store_true", help="ssl assert hostname Default variables False")
 
-parser.add_argument("--user", dest="auth_username", default="", help="HTTP authentication Username")
-parser.add_argument("--pass", dest="auth_password", default="", help="HTTP authentication Password")
+parser.add_argument("--user", dest="auth_username", default="", help="basic authentication Username")
+parser.add_argument("--pass", dest="auth_password", default="", help="basic authentication Password")
 
 # Parse the arguments
 args = parser.parse_args()
@@ -77,9 +79,8 @@ args = parser.parse_args()
 NUMBER_OF_INDICES = args.indices
 NUMBER_OF_DOCUMENTS = args.documents
 NUMBER_OF_CLIENTS = args.client_conn
-NUMBER_OF_SECONDS = args.seconds
-NUMBER_OF_SHARDS = args.number_of_shards
-NUMBER_OF_REPLICAS = args.number_of_replicas
+NUMBER_OF_SECONDS = args.duration
+NUMBER_OF_SHARDS = args.shards
 BULK_SIZE = args.bulk_size
 MAX_FIELDS_PER_DOCUMENT = args.max_fields_per_document
 MAX_SIZE_PER_FIELD = args.max_size_per_field
@@ -88,8 +89,11 @@ STATS_FREQUENCY = args.stats_frequency
 WAIT_FOR_GREEN = args.green
 CA_FILE = args.cafile
 VERIFY_CERTS =  not args.no_verify
+HTTP_COMPRESS =  not args.http_compress
 AUTH_USERNAME = args.auth_username
 AUTH_PASSWORD = args.auth_password
+SSL_SHOW_WARN = not args.ssl_show_warn
+SSL_ASSERT_HOSTNAME = not args.ssl_assert_hostname
 
 # timestamp placeholder
 STARTED_TIMESTAMP = 0
@@ -101,7 +105,7 @@ total_size = 0
 indices = []
 documents = []
 documents_templates = []
-es = None  # Will hold the elasticsearch session
+es = None  # Will hold the opensearch session
 
 
 
@@ -216,8 +220,9 @@ def client_worker(es, indices, STARTED_TIMESTAMP):
         # Iterate over the bulk size
         for _ in range(BULK_SIZE):
             # Generate the bulk operation
-            curr_bulk += "{0}\n".format(json.dumps({"index": {"_index": choice(indices), "_type": "stresstest"}}))
+            curr_bulk += "{0}\n".format(json.dumps({"index": {"_index": choice(indices), "_type": "perftest"}}))
             curr_bulk += "{0}\n".format(json.dumps(choice(documents)))
+
 
         try:
             # Perform the bulk operation
@@ -278,8 +283,9 @@ def generate_indices(es):
 
         try:
             # And create it in ES with the shard count and replicas
-            es.indices.create(index=temp_index, settings={"number_of_shards": NUMBER_OF_SHARDS,
-                                                                   "number_of_replicas": NUMBER_OF_REPLICAS})
+
+            es.indices.create(temp_index, body={ "settings": { "number_of_shards": NUMBER_OF_SHARDS } })
+            
 
         except Exception as e:
             print("Could not create index. Is your cluster ok?")
@@ -350,29 +356,32 @@ def main():
     # Set the timestamp
     STARTED_TIMESTAMP = int(time.time())
 
-    for esaddress in args.es_ip:
+    for esaddress in args.os_ip:
         print("")
         print("Starting initialization of {0}".format(esaddress))
         try:
-            # Initiate the elasticsearch session
+            # Initiate the opensearch session
             # We increase the timeout here from the default value (10 seconds)
             # to ensure we wait for requests to finish even if the cluster is overwhelmed
             # and it takes a bit longer to process one bulk.
 
             if CA_FILE:
-                context = ssl.create_default_context(cafile=CA_FILE)
+                context = CA_FILE
          
             if AUTH_USERNAME and AUTH_PASSWORD:
                 auth = (AUTH_USERNAME, AUTH_PASSWORD)
 
-            es = Elasticsearch(
+            es = OpenSearch(
                 esaddress,
+                http_compress=HTTP_COMPRESS,
                 http_auth=auth,
                 verify_certs=VERIFY_CERTS,
-                ssl_context=context,
-                timeout=60)
+                ca_certs=context,
+                use_ssl = VERIFY_CERTS,
+                ssl_assert_hostname = SSL_ASSERT_HOSTNAME,
+                ssl_show_warn = SSL_SHOW_WARN)
         except Exception as e:
-            print("Could not connect to elasticsearch!")
+            print("Could not connect to opensearch!")
             print(e)
             sys.exit(1)
 

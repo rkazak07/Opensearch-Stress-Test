@@ -8,21 +8,19 @@ documents=2
 clients=10
 duration=900
 shards=4
-replicas=1
 bulk_size=500
 max_fields_per_doc=50
 max_size_per_field=500
 stats_frequency=30
 
 host=https://10.10.33.101:9200
-username=elastic
-password=Passw0Rd!
+username=admin
+password=admin
 
 python3 os-perf-test.py --es_ip $host \
         --indices $indices --documents $documents \
         --client_conn $clients --duration $seconds \
-        --number-of-shards $shards \
-        --number-of-replicas $replicas \
+        --shards $shards \
         --bulk-size $bulk_size \
         --max-fields-per-document $max_fields_per_doc \
         --max-size-per-field $max_size_per_field \

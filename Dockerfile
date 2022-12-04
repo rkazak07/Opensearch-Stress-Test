@@ -1,6 +1,6 @@
 FROM python:3.8-slim-buster
 
-MAINTAINER Ramazan KAZAK
+MAINTAINER Ramazan KAZAK (ramazankazak_2016@hotmail.com)
 
 
 WORKDIR /app
@@ -8,9 +8,9 @@ WORKDIR /app
 
 # Edit Opensearch Configuration
 
-ENV host=10.10.33.101
-ENV user=elastic
-ENV pass=elastic
+ENV host=https://10.10.33.101:9200
+ENV user=admin
+ENV pass=admin
 ENV indices=5
 ENV documents=2
 ENV clients=10
@@ -27,10 +27,10 @@ RUN pip install opensearch-py
 
 COPY . .
 
-CMD python es-perf-test.py  --es_ip $host \
+CMD python os-perf-test.py  --es_ip $host \
         --indices $indices --documents $documents \
         --client_conn $clients --seconds $seconds \
-        --number-of-shards $shards \
+        --shards $shards \
         --bulk-size $bulk_size \
         --max-fields-per-document $max_fields_per_doc \
         --max-size-per-field $max_size_per_field \
