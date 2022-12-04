@@ -7,7 +7,6 @@ SET documents=2
 SET clients=10
 SET seconds=900
 SET shards=4
-SET replicas=0
 SET bulk_size=500
 SET max_fields_per_doc=50
 SET max_size_per_field=500
