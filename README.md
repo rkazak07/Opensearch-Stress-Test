@@ -55,7 +55,7 @@ The generation of documents is being processed before the run, so it will not ov
 
 
 ### Examples
-> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 2 client connections
+> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 2 different writing threads run the script for 120 seconds
 ```bash
 python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 ```
@@ -112,7 +112,7 @@ Done!
 ```
 > While running the Docker image, revise the parameters according to your system.
 ```bash
- docker run -t -i rkazak1/os-perf-test:v1 --os_ip https://ip:port \
+ docker run -t -i rkazak1/os-perf-test:v1 --os_ip <https://ip:port> \
 --indices <indices number> --documents <document number> \
 --client_conn <client number> --duration <duration> \
 --shards <shards number> --bulk_number <bulk number> \
