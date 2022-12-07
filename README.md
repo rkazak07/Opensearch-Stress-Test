@@ -8,7 +8,7 @@ This script generates a bunch of documents, and indexes as much as it can to Ope
 
 ### How to use
 * Download this project
-* Change script
+* Change Dockerfile or script
 * Make sure you have Python 3.6+
 * pip install opensearch-py (Tested in 1.1.0 and 2.0.1)
 
