@@ -4,7 +4,7 @@
 This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. 
 
 * Note: This application is developed in opensearch version 1.3.6
-* Note: If you constantly receive a failed error even though the Opensearch server has a low resource usage. Review the resource usage of the computer on which you perform the operation.
+* Note2: If you constantly receive a failed error even though the Opensearch server has a low resource usage. Review the resource usage of the computer on which you perform the operation.
 
 ### How to use
 * Download this project
