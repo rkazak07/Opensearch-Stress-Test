@@ -65,9 +65,10 @@ parser.set_defaults(green=True)
 
 parser.add_argument("--ca-file", dest="cafile", default="", help="Path to your certificate file")
 parser.add_argument("--no-verify", default=False, dest="no_verify", action="store_true", help="Do not verify certificate")
-parser.add_argument("--ssl_show_warn", default=False, dest="ssl_show_warn", action="store_true", help="show ssl warnings")
-parser.add_argument("--http_compress", default=False, dest="http_compress", action="store_true", help="enables gzip compression for request bodies")
-parser.add_argument("--ssl_assert_hostname", default=False, dest="ssl_assert_hostname", action="store_true", help="ssl assert hostname Default variables False")
+parser.add_argument("--use_ssl", default=False, dest="use_ssl", action="store_true", help="Can be used if the certificate is trusted")
+parser.add_argument("--ssl_show_warn", default=False, dest="ssl_show_warn", action="store_true", help="Show ssl warnings")
+parser.add_argument("--http_compress", default=False, dest="http_compress", action="store_true", help=" If enabled then HTTP request bodies will be compressed with gzip and HTTP responses")
+parser.add_argument("--ssl_assert_hostname", default=False, dest="ssl_assert_hostname", action="store_true", help="Use the hostname from the URL, if False suppress hostname checking")
 
 parser.add_argument("--user", dest="auth_username", default="", help="Basic authentication Username")
 parser.add_argument("--pass", dest="auth_password", default="", help="Basic authentication Password")
@@ -89,6 +90,7 @@ STATS_FREQUENCY = args.stats_frequency
 WAIT_FOR_GREEN = args.green
 CA_FILE = args.cafile
 VERIFY_CERTS =  not args.no_verify
+USE_SSL =  not args.use_ssl
 SSL_SHOW_WARN = not args.ssl_show_warn
 HTTP_COMPRESS =  not args.http_compress
 SSL_ASSERT_HOSTNAME = not args.ssl_assert_hostname
@@ -379,7 +381,7 @@ def main():
                 http_auth=auth,
                 verify_certs=VERIFY_CERTS,
                 ca_certs=context,
-                use_ssl = VERIFY_CERTS,
+                use_ssl = USE_SSL,
                 ssl_assert_hostname = SSL_ASSERT_HOSTNAME,
                 ssl_show_warn = SSL_SHOW_WARN)
         except Exception as e:

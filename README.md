@@ -44,10 +44,11 @@ The generation of documents is being processed before the run, so it will not ov
 | `--stats-frequency` | How frequent to show the statistics |30|
 | `--not-green` | Script doesn't wait for the cluster to be green |False|
 | `--ca-file` | Path to Certificate file ||
-| `--no-verify` | No verify SSL certificates|False|
-|`--ssl_show_warn` | show ssl warnings|False|
-|`--http_compress` | enables gzip compression for request bodies|False|
-|`--ssl_assert_hostname` | ssl assert hostname Default variables False|False|
+| `--no-verify` | No verify SSL certificates |False|
+| `--use_ssl` | Can be used if the certificate is trusted |False|
+|`--ssl_show_warn` | Show ssl warnings |False|
+|`--http_compress` | If enabled then HTTP request bodies will be compressed with gzip and HTTP responses |False|
+|`--ssl_assert_hostname` | Use the hostname from the URL, if **False** suppress hostname checking |False|
 | `--user` | Basic authentication Username ||
 | `--pass` | Basic authentication Password ||
 
@@ -55,24 +56,24 @@ The generation of documents is being processed before the run, so it will not ov
 
 
 ### Examples
-> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 2 different writing threads run the script for 120 seconds
+> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 2 different writing threads run the script for 60 seconds
 ```bash
 python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 ```
 
 > Run the test with SSL
 ```bash
- python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --seconds 120 --ca-file /path/ca.pem
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --duration 120 --ca-file /path/ca.pem
 ```
 
 > Run the test with SSL without verify the certificate
 ```bash
- python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --seconds 120 --no-verify
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --duration 120 --no-verify
 ```
 
 > Run the test with HTTP Authentification
 ```bash
- python os-perf-test.py --os_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user admin --pass admin
+ python os-perf-test.py --os_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --duration 120 --user admin --pass admin
 ```
 
 ### Example Output
