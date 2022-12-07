@@ -28,7 +28,7 @@ The generation of documents is being processed before the run, so it will not ov
 | `--os_ip` | Address of the Opensearch cluster (no protocol and port). You can supply mutiple clusters here, but only **one** node in each cluster (preferably the client node) |
 | `--indices` | Number of indices to write to |
 | `--documents` | Number of template documents that hold the same mapping |
-| `--client_conn`   | Number of threads that send bulks to ES |
+| ` --client_conn `   | Number of threads that send bulks to ES |
 | `--duration` | How long should the test run. Note: it might take a bit longer, as sending of all bulks whose creation has been initiated is allowed |
 
 
