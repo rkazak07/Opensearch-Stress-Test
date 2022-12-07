@@ -111,7 +111,7 @@ Done!
 ```
 > Run your docker image by specifying parameters.
 ```bash
- docker run rkazak1/os-perf-test:v1 --os_ip https://10.10.33.101:9200 \
+ docker run -t -i rkazak1/os-perf-test:v1 --os_ip https://10.10.33.101:9200 \
 --indices 5 --documents 2 \
 --client_conn 10 --duration 200 \
 --shards 4 --bulk_number 800 \
@@ -124,3 +124,5 @@ Done!
 --not-green
 ```
 
+
+### Docker Example
