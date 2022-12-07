@@ -4,6 +4,7 @@
 This script generates a bunch of documents, and indexes as much as it can to Opensearch. While doing so, it prints out metrics to the screen to let you follow how your cluster is doing. 
 
 Note: This application is developed in opensearch version 1.3.6
+Note: If you constantly receive a failed error even though the Opensearch server has a low resource usage. Review the resource usage of the computer on which you perform the operation.
 
 ### How to use
 * Download this project
@@ -35,19 +36,19 @@ The generation of documents is being processed before the run, so it will not ov
 | Parameter | Description | Default
 | --- | --- | --- |
 | `--shards` | How many shards per index |3|
-| `--bulk-size` | How many documents each bulk request should contain |1000|
+| `--bulk_number` | How many documents each bulk request should contain |500|
 | `--max-fields-per-document` | What is the maximum number of fields each document template should hold |100|
 | `--max-size-per-field` | When populating the templates, what is the maximum length of the data each field would get |1000|
 | `--no-cleanup` | Boolean field. Don't delete the indices after completion |False|
 | `--stats-frequency` | How frequent to show the statistics |30|
 | `--not-green` | Script doesn't wait for the cluster to be green |False|
-| `--no-verify` | No verify SSL certificates|False|
-|`--http_compress` | enables gzip compression for request bodies|False|
-|`--ssl_show_warn` | show ssl warnings|False|
-|`--ssl_assert_hostname` | ssl assert hostname Default variables False|False|
 | `--ca-file` | Path to Certificate file ||
-| `--user` | basic authentication Username ||
-| `--pass` | basic authentication Password ||
+| `--no-verify` | No verify SSL certificates|False|
+|`--ssl_show_warn` | show ssl warnings|False|
+|`--http_compress` | enables gzip compression for request bodies|False|
+|`--ssl_assert_hostname` | ssl assert hostname Default variables False|False|
+| `--user` | Basic authentication Username ||
+| `--pass` | Basic authentication Password ||
 
 
 
@@ -55,27 +56,27 @@ The generation of documents is being processed before the run, so it will not ov
 ### Examples
 > Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 5 different writing threads run the script for 120 seconds and contains 2 client connections
 ```bash
-python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk-size 500 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
+python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 ```
 
 > Run the test with SSL
 ```bash
- python os-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --seconds 120 --ca-file /path/ca.pem
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --seconds 120 --ca-file /path/ca.pem
 ```
 
 > Run the test with SSL without verify the certificate
 ```bash
- python os-perf-test.py --es_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --seconds 120 --no-verify
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --seconds 120 --no-verify
 ```
 
 > Run the test with HTTP Authentification
 ```bash
- python os-perf-test.py --es_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user admin --pass admin
+ python os-perf-test.py --os_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user admin --pass admin
 ```
 
 ## EXAMPLE OUTPUT
 ```
-python3 os-perf-test.py --os_ip https://10.10.33.102:30650 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk-size 500 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
+python3 os-perf-test.py --os_ip https://10.10.33.102:30650 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 
 Starting initialization of https://10.10.33.102:30650
 Done!
@@ -112,7 +113,4 @@ Done!
 ```bash
  docker run -d rkazak1/os-perf-test:v1 > log.txt
 ```
-### Contribution
-You are more then welcome!
-Please open a PR or issues here.
 

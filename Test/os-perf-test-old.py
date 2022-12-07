@@ -32,8 +32,7 @@ import json
 
 # Try and import opensearch
 try:
-    import ssl
-    from opensearchpy import OpenSearch, helpers
+    from opensearchpy import OpenSearch
 
 except:
     print("Could not import opensearch..")
@@ -68,6 +67,7 @@ parser.add_argument("--ca-file", dest="cafile", default="", help="Path to your c
 parser.add_argument("--no-verify", default=False, dest="no_verify", action="store_true", help="Do not verify certificate")
 parser.add_argument("--ssl_show_warn", default=False, dest="ssl_show_warn", action="store_true", help="show ssl warnings")
 parser.add_argument("--http_compress", default=False, dest="http_compress", action="store_true", help="enables gzip compression for request bodies")
+parser.add_argument("--ssl_assert_hostname", default=False, dest="ssl_assert_hostname", action="store_true", help="ssl assert hostname Default variables False")
 
 parser.add_argument("--user", dest="auth_username", default="", help="basic authentication Username")
 parser.add_argument("--pass", dest="auth_password", default="", help="basic authentication Password")
@@ -92,7 +92,8 @@ VERIFY_CERTS =  not args.no_verify
 HTTP_COMPRESS =  not args.http_compress
 AUTH_USERNAME = args.auth_username
 AUTH_PASSWORD = args.auth_password
-SSL_SHOW_WARN = args.ssl_show_warn
+SSL_SHOW_WARN = not args.ssl_show_warn
+SSL_ASSERT_HOSTNAME = not args.ssl_assert_hostname
 
 # timestamp placeholder
 STARTED_TIMESTAMP = 0
@@ -365,7 +366,7 @@ def main():
             # and it takes a bit longer to process one bulk.
 
             if CA_FILE:
-                context = ssl.create_default_context(cafile=CA_FILE)
+                context = CA_FILE
          
             if AUTH_USERNAME and AUTH_PASSWORD:
                 auth = (AUTH_USERNAME, AUTH_PASSWORD)
@@ -376,6 +377,8 @@ def main():
                 http_auth=auth,
                 verify_certs=VERIFY_CERTS,
                 ca_certs=context,
+                use_ssl = VERIFY_CERTS,
+                ssl_assert_hostname = SSL_ASSERT_HOSTNAME,
                 ssl_show_warn = SSL_SHOW_WARN)
         except Exception as e:
             print("Could not connect to opensearch!")

@@ -27,11 +27,11 @@ RUN pip install opensearch-py
 
 COPY . .
 
-CMD python os-perf-test.py  --es_ip $host \
+CMD python os-perf-test.py  --os_ip $host \
         --indices $indices --documents $documents \
         --client_conn $clients --seconds $seconds \
         --shards $shards \
-        --bulk-size $bulk_size \
+        --bulk_number $bulk_size \
         --max-fields-per-document $max_fields_per_doc \
         --max-size-per-field $max_size_per_field \
         --stats-frequency $stats_frequency 

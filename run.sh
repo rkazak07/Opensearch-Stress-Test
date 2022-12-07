@@ -17,11 +17,11 @@ host=https://10.10.33.101:9200
 username=admin
 password=admin
 
-python3 os-perf-test.py --es_ip $host \
+python3 os-perf-test.py --os_ip $host \
         --indices $indices --documents $documents \
-        --client_conn $clients --duration $seconds \
+        --client_conn $clients --duration $duration \
         --shards $shards \
-        --bulk-size $bulk_size \
+        --bulk_number $bulk_size \
         --max-fields-per-document $max_fields_per_doc \
         --max-size-per-field $max_size_per_field \
         --stats-frequency $stats_frequency \

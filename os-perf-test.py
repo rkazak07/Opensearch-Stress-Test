@@ -3,7 +3,7 @@
 #
 # Stress test tool for Opensearch
 # 
-# Created and Generated Ramazan KAZAK
+# Prepared by Ramazan KAZAK
 #  https://devsecopsteam.com
 
 import signal
@@ -47,13 +47,13 @@ urllib3.disable_warnings()
 parser = argparse.ArgumentParser()
 
 # Adds all params
-parser.add_argument("--os_ip", nargs='+', help="The address of your cluster (no protocol or port)", required=True)
+parser.add_argument("--os_ip", nargs='+', help="The address of your cluster ", required=True)
 parser.add_argument("--indices", type=int, help="The number of indices to write to for each ip", required=True)
 parser.add_argument("--documents", type=int, help="The number different documents to write for each ip", required=True)
 parser.add_argument("--client_conn", type=int, help="The number of clients to write from for each ip", required=True)
 parser.add_argument("--duration", type=int, help="The number of seconds to run for each ip", required=True)
 parser.add_argument("--shards", type=int, default=3, help="Number of shards per index (default 3)")
-parser.add_argument("--bulk-size", type=int, default=1000, help="Number of document per request (default 1000)")
+parser.add_argument("--bulk_number", type=int, default=500, help="Number of document per request (default 500)")
 parser.add_argument("--max-fields-per-document", type=int, default=100,
                     help="Max number of fields in each document (default 100)")
 parser.add_argument("--max-size-per-field", type=int, default=1000, help="Max content size per field (default 1000")
@@ -69,19 +69,19 @@ parser.add_argument("--ssl_show_warn", default=False, dest="ssl_show_warn", acti
 parser.add_argument("--http_compress", default=False, dest="http_compress", action="store_true", help="enables gzip compression for request bodies")
 parser.add_argument("--ssl_assert_hostname", default=False, dest="ssl_assert_hostname", action="store_true", help="ssl assert hostname Default variables False")
 
-parser.add_argument("--user", dest="auth_username", default="", help="basic authentication Username")
-parser.add_argument("--pass", dest="auth_password", default="", help="basic authentication Password")
+parser.add_argument("--user", dest="auth_username", default="", help="Basic authentication Username")
+parser.add_argument("--pass", dest="auth_password", default="", help="Basic authentication Password")
 
 # Parse the arguments
 args = parser.parse_args()
 
-# Set variables from argparse output (for readability)
+# Set variables from argparse output
 NUMBER_OF_INDICES = args.indices
 NUMBER_OF_DOCUMENTS = args.documents
 NUMBER_OF_CLIENTS = args.client_conn
 NUMBER_OF_SECONDS = args.duration
 NUMBER_OF_SHARDS = args.shards
-BULK_SIZE = args.bulk_size
+BULK_SIZE = args.bulk_number
 MAX_FIELDS_PER_DOCUMENT = args.max_fields_per_document
 MAX_SIZE_PER_FIELD = args.max_size_per_field
 NO_CLEANUP = args.no_cleanup
@@ -89,11 +89,13 @@ STATS_FREQUENCY = args.stats_frequency
 WAIT_FOR_GREEN = args.green
 CA_FILE = args.cafile
 VERIFY_CERTS =  not args.no_verify
+SSL_SHOW_WARN = not args.ssl_show_warn
 HTTP_COMPRESS =  not args.http_compress
+SSL_ASSERT_HOSTNAME = not args.ssl_assert_hostname
 AUTH_USERNAME = args.auth_username
 AUTH_PASSWORD = args.auth_password
-SSL_SHOW_WARN = not args.ssl_show_warn
-SSL_ASSERT_HOSTNAME = not args.ssl_assert_hostname
+
+
 
 # timestamp placeholder
 STARTED_TIMESTAMP = 0
@@ -105,7 +107,7 @@ total_size = 0
 indices = []
 documents = []
 documents_templates = []
-es = None  # Will hold the opensearch session
+os = None  # Will hold the opensearch session
 
 
 
@@ -211,7 +213,7 @@ def fill_documents(documents_templates):
         documents.append(temp_doc)
 
 
-def client_worker(es, indices, STARTED_TIMESTAMP):
+def client_worker(os, indices, STARTED_TIMESTAMP):
     # Running until timeout
     while (not has_timeout(STARTED_TIMESTAMP)) and (not shutdown_event.is_set()):
 
@@ -226,7 +228,7 @@ def client_worker(es, indices, STARTED_TIMESTAMP):
 
         try:
             # Perform the bulk operation
-            es.bulk(body=curr_bulk)
+            os.bulk(body=curr_bulk)
 
             # Adding to success bulks
             increment_success()
@@ -240,13 +242,13 @@ def client_worker(es, indices, STARTED_TIMESTAMP):
             increment_failure()
 
 
-def generate_clients(es, indices, STARTED_TIMESTAMP):
+def generate_clients(os, indices, STARTED_TIMESTAMP):
     # Clients placeholder
     temp_clients = []
 
     # Iterate over the clients count
     for _ in range(NUMBER_OF_CLIENTS):
-        temp_thread = Thread(target=client_worker, args=[es, indices, STARTED_TIMESTAMP])
+        temp_thread = Thread(target=client_worker, args=[os, indices, STARTED_TIMESTAMP])
         temp_thread.daemon = True
 
         # Create a thread and push it to the list
@@ -269,7 +271,7 @@ def generate_documents():
     return temp_documents
 
 
-def generate_indices(es):
+def generate_indices(os):
     # Placeholder
     temp_indices = []
 
@@ -284,7 +286,7 @@ def generate_indices(es):
         try:
             # And create it in ES with the shard count and replicas
 
-            es.indices.create(temp_index, body={ "settings": { "number_of_shards": NUMBER_OF_SHARDS } })
+            os.indices.create(temp_index, body={ "settings": { "number_of_shards": NUMBER_OF_SHARDS } })
             
 
         except Exception as e:
@@ -296,12 +298,12 @@ def generate_indices(es):
     return temp_indices
 
 
-def cleanup_indices(es, indices):
+def cleanup_indices(os, indices):
     # Iterate over all indices and delete those
     for curr_index in indices:
         try:
             # Delete the index
-            es.indices.delete(index=curr_index, ignore=[400, 404])
+            os.indices.delete(index=curr_index, ignore=[400, 404])
 
         except:
             print("Could not delete index: {0}. Continue anyway..".format(curr_index))
@@ -371,7 +373,7 @@ def main():
             if AUTH_USERNAME and AUTH_PASSWORD:
                 auth = (AUTH_USERNAME, AUTH_PASSWORD)
 
-            es = OpenSearch(
+            os = OpenSearch(
                 esaddress,
                 http_compress=HTTP_COMPRESS,
                 http_auth=auth,
@@ -392,22 +394,22 @@ def main():
         print("Done!")
         print("Creating indices.. ")
 
-        indices = generate_indices(es)
+        indices = generate_indices(os)
         all_indices.extend(indices)
 
         try:
             #wait for cluster to be green if nothing else is set
             if WAIT_FOR_GREEN:
-                es.cluster.health(wait_for_status='green', master_timeout='600s', timeout='600s')
+                os.cluster.health(wait_for_status='green', master_timeout='600s', timeout='600s')
         except Exception as e:
             print("Cluster timeout....")
             print("Cleaning up created indices.. "),
 
-            cleanup_indices(es, indices)
+            cleanup_indices(os, indices)
             continue
 
         print("Generating documents and workers.. ")  # Generate the clients
-        clients.extend(generate_clients(es, indices, STARTED_TIMESTAMP))
+        clients.extend(generate_clients(os, indices, STARTED_TIMESTAMP))
 
         print("Done!")
 
@@ -448,7 +450,7 @@ def main():
                             flag = True
                             
                 print("Cleaning up created indices.. "),
-                cleanup_indices(es, all_indices)
+                cleanup_indices(os, all_indices)
 
     print("\nTest is done! Final results:")
     print_stats(STARTED_TIMESTAMP)
@@ -457,7 +459,7 @@ def main():
     if not NO_CLEANUP:
         print("Cleaning up created indices.. "),
 
-        cleanup_indices(es, all_indices)
+        cleanup_indices(os, all_indices)
 
         print("Done!")  # # Main runner
 
@@ -465,7 +467,7 @@ try:
     main()
 
 except Exception as e:
-    print("Got unexpected exception. probably a bug, please report it.")
+    print("Got unexpected exception. probably a bug, please 'https://devsecops.com' address report it.")
     print("")
     print(e.message)
     print("")
