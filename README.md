@@ -105,12 +105,22 @@ Done!
 
 ### Docker Installation
 
-> Edit Dockerfile 
+> Build Docker images
 ```bash
- docker build -t rkazak1/os-perf-test:v1.
+ docker build -t rkazak1/os-perf-test:v1 .
 ```
-> The content output is in the log.txt file
+> Run your docker image by specifying parameters.
 ```bash
- docker run -d rkazak1/os-perf-test:v1 > log.txt
+ docker run rkazak1/os-perf-test:v1 --os_ip https://10.10.33.101:9200 \
+--indices 5 --documents 2 \
+--client_conn 10 --duration 200 \
+--shards 4 --bulk_number 800 \
+--max-fields-per-document 50 \
+--max-size-per-field 500 \
+--stats-frequency 30 \
+--user admin \
+--pass admin \
+--no-verify \
+--not-green
 ```
 
