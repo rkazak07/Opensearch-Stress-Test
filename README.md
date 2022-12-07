@@ -74,7 +74,7 @@ python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass adm
  python os-perf-test.py --os_ip 10.10.33.100 --indices 5 --documents 5 --client_conn 1 --seconds 120 --user admin --pass admin
 ```
 
-## EXAMPLE OUTPUT
+## Example Output
 ```
 python3 os-perf-test.py --os_ip https://10.10.33.102:30650 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
 
