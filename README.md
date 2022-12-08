@@ -56,19 +56,19 @@ The generation of documents is being processed before the run, so it will not ov
 
 
 ### Examples
-> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, open 2 different writing threads run the script for 60 seconds
+> Run the test for 1 Opensearch clusters, with 5 indices on each, 10 random documents, don't wait for the cluster to be green, with SSL without verify the certificate, open 2 different writing threads run the script for 60 seconds
 ```bash
-python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --shards 1
+python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --use_ssl --no-verify --not-green --shards 1
 ```
 
 > Run the test with SSL
 ```bash
- python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 2  --duration 120 --ca-file /path/ca.pem
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass admin --use_ssl --indices 5 --documents 5 --client_conn 2  --duration 120 --ca-file /path/ca.pem
 ```
 
 > Run the test with SSL without verify the certificate
 ```bash
- python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --duration 120 --no-verify
+ python os-perf-test.py --os_ip https://10.10.33.101:9200 --indices 5 --documents 5 --client_conn 1 --duration 120 --use_ssl  --no-verify
 ```
 
 > Run the test with HTTP Authentification
@@ -77,10 +77,13 @@ python os-perf-test.py --os_ip https://10.10.33.101:9200 --user admin --pass adm
 ```
 
 ### Example Output
-```
-python3 os-perf-test.py --os_ip https://10.10.33.102:30650 --user admin --pass admin --indices 5 --documents 10 --client_conn 2 --duration 60 --no-verify --not-green --bulk_number 800 --shards 1 --ssl_assert_hostname --http_compress --ssl_show_warn --not-green
+> Run the test  Opensearch cluster on rhel8 , with 5 indices on each, 10 random documents, don't wait for the cluster to be green, with SSL without verify the certificate, open 2 different writing threads run the script for 60 seconds
+```bash
+[root@MasterNode opensearch-stress-test]# sh run2.sh
 
 Starting initialization of https://10.10.33.102:30650
+/usr/local/lib/python3.6/site-packages/opensearchpy/connection/http_urllib3.py:201: UserWarning: Connecting to https://10.10.33.102:30650 using SSL with verify_certs=False is insecure.
+  % self.host
 Done!
 Creating indices..
 Generating documents and workers..
@@ -89,19 +92,20 @@ Starting the test. Will print stats every 30 seconds.
 The test would run for 60 seconds, but it might take a bit more because we are waiting for current bulk operation to complete.
 
 Elapsed time: 31 seconds
-Successful bulks: 52 (26000 documents)
+Successful bulks: 35 (17500 documents)
 Failed bulks: 0 (0 documents)
-Indexed approximately 770.9049263000488 MB which is 24.87 MB/s
+Indexed approximately 494.8754653930664 MB which is 15.96 MB/s
 
 
 Test is done! Final results:
-Elapsed time: 60 seconds
-Successful bulks: 111 (55500 documents)
+Elapsed time: 61 seconds
+Successful bulks: 78 (39000 documents)
 Failed bulks: 0 (0 documents)
-Indexed approximately 1647.783311843872 MB which is 27.46 MB/s
+Indexed approximately 1104.9954175949097 MB which is 18.11 MB/s
 
 Cleaning up created indices..
 Done!
+
 ```
 
 
@@ -125,54 +129,64 @@ Done!
 
 
 ### Docker Example
-> Run the test with ssl without validation the certificate for 1 Opensearch cluster with 5 indices, 5 random documents  in each ,don't wait for the cluster to be green, open 10 different write threads and run the script for 100 seconds
+> Run the test on O-S cluster 10.10.33.102, with 5 indices, 5 random documents with up to 20 fields in each, the size of each field on each document can be up to 5 chars, each index will have 1 shard and 1 replicas, the test will run from 2 client (thread) for 100 seconds, will print statistics every 15 seconds, will index in bulks of 500 documents  will leave everything in Opensearch after the test 
 ````
 [root@server opensearch-stress-test]# docker run -t -i rkazak1/os-perf-test:v1 --os_ip https://10.10.33.102:30650 \
 > --user admin \
 > --pass admin \
 > --no-verify \
+> --use_ssl \
 > --indices 5 --documents 5 \
-> --client_conn 10 --duration 100 \
-> --not-green \
-> --http_compress \
-> --ssl_assert_hostname \
-> --ssl_show_warn
+> --client_conn 2 --duration 100 \
+> --max-fields-per-document 5 --max-size-per-field 20 \
+> --no-cleanup --stats-frequency 15 
+> --no-verify \
+> --not-green 
 
 Starting initialization of https://10.10.33.102:30650
+/usr/local/lib/python3.10/dist-packages/opensearchpy/connection/http_urllib3.py:199: UserWarning: Connecting to https://10.10.33.102:30650 using SSL with verify_certs=False is insecure.
+  warnings.warn(
 Done!
 Creating indices..
-
 Generating documents and workers..
 Done!
-Starting the test. Will print stats every 30 seconds.
+Starting the test. Will print stats every 15 seconds.
 The test would run for 100 seconds, but it might take a bit more because we are waiting for current bulk operation to complete.
 
+Elapsed time: 17 seconds
+Successful bulks: 230 (115000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 11.710894584655762 MB which is 0.69 MB/s
+
 Elapsed time: 32 seconds
-Successful bulks: 46 (23000 documents)
-Failed bulks: 64 (32000 documents)
-Indexed approximately 490.70516300201416 MB which is 15.33 MB/s
+Successful bulks: 544 (272000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 27.701778411865234 MB which is 0.87 MB/s
+
+Elapsed time: 47 seconds
+Successful bulks: 866 (433000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 44.09731578826904 MB which is 0.94 MB/s
 
 Elapsed time: 62 seconds
-Successful bulks: 88 (44000 documents)
-Failed bulks: 142 (71000 documents)
-Indexed approximately 942.7716693878174 MB which is 15.21 MB/s
+Successful bulks: 1224 (612000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 62.339834213256836 MB which is 1.01 MB/s
+
+Elapsed time: 77 seconds
+Successful bulks: 1588 (794000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 80.8918342590332 MB which is 1.05 MB/s
 
 Elapsed time: 92 seconds
-Successful bulks: 101 (50500 documents)
-Failed bulks: 363 (181500 documents)
-Indexed approximately 1079.806526184082 MB which is 11.74 MB/s
+Successful bulks: 1913 (956500 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 97.4452133178711 MB which is 1.06 MB/s
 
 
 Test is done! Final results:
-Elapsed time: 104 seconds
-Successful bulks: 101 (50500 documents)
-Failed bulks: 440 (220000 documents)
-Indexed approximately 1079.806526184082 MB which is 10.38 MB/s
+Elapsed time: 100 seconds
+Successful bulks: 2092 (1046000 documents)
+Failed bulks: 0 (0 documents)
+Indexed approximately 106.56290054321289 MB which is 1.07 MB/s
 
-Cleaning up created indices..
-Could not delete index: fuqkjzvv. Continue anyway..
-Could not delete index: dwgsjik. Continue anyway..
-Could not delete index: ikdolzrvmqbov. Continue anyway..
-Could not delete index: todhzydcsstmkmc. Continue anyway..
-Could not delete index: djtxgcklmygemh. Continue anyway..
-Done!
